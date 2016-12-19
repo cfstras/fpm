@@ -38,6 +38,7 @@ class FPM::Package::PleaseRun < FPM::Package
       platform.name = attributes[:pleaserun_name]
       platform.args = command[1..-1]
       platform.chdir = attributes[:pleaserun_chdir] if attributes[:pleaserun_chdir]
+      platform.environment_variables = attributes[:pleaserun_environment_variables] if attributes[:pleaserun_environment_variables]
       platform.description = if attributes[:description_given?]
         attributes[:description]
       else

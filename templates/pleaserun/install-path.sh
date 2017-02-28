@@ -15,9 +15,13 @@ install_path() {
       if [ "$(dirname "$d")" = "/etc/default" ]; then
         # upgrade
         echo "upgrading file $1"
-        _new_entries=$(awk -F"=" '{print $1}' "$1")
+        _tmp_new=$(mktemp)
+        _tmp_old=$(mktemp)
+        sed 's|^export\s*#|#|g' "$1"         | sed 's|^\s*\(#.*\)\s*=""|\1|g' > "$_tmp_new"
+        sed 's|^export\s*#|#|g' "$_old_file" | sed 's|^\s*\(#.*\)\s*=""|\1|g' > "$_tmp_old"
+        _new_entries=$(awk -F"=" '{gsub(/^[ \t]+/, "", $1); gsub(/[ \t]+$/, "", $1);print $1}' "$_tmp_new")
         if [ -f "${_old_file}" ]; then
-          _old_entries=$(awk -F"=" '{print $1}' "${_old_file}")
+          _old_entries=$(awk -F"=" '{gsub(/^[ \t]+/, "", $1); gsub(/[ \t]+$/, "", $1);print $1}' "${_tmp_old}")
         else
           _old_entries=""
         fi
@@ -25,13 +29,13 @@ install_path() {
 '
         for key in ${_new_entries}; do
           if ! echo "${_old_entries}" | silent grep "${key}"; then
-            [ -f "${_old_file}" ] && echo "New setting: $(egrep "^${key}=" "$1")"
-            egrep "^${key}" "$1" | sed 's|^export\s*#|#|g' | sed 's|^\s*\(#.*\)=""|\1|g' >> "${_old_file}"
+            echo "New setting $key: $(egrep "^${key}" "$_tmp_new")|"
+            egrep "^${key}" "$_tmp_new" >> "${_old_file}"
           fi
         done
         # TODO obsolete settings
         IFS=' '
-        
+        rm -f "$_tmp_new" "$_tmp_old"
       else
         cp -p "$1" "$d"
       fi

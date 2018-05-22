@@ -51,7 +51,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("archive-tar-minitar", "0.5.2") # license: GPL2+
 
   # For creating FreeBSD package archives (xz-compressed tars)
-  spec.add_dependency("ruby-xz") # license: MIT
+  spec.add_dependency("ruby-xz", "0.2.3") # license: MIT
 
   # For sourcing from pleaserun 
   spec.add_dependency("pleaserun", "~> 0.0.24") # license: Apache 2
